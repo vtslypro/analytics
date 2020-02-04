@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+    <import resource="spring.redisCache.xml" />
+
+    <!-- Data base connection -->
+   <!-- <bean id="dataSource" class="com.adsk.acad.utils.data.dataSources.EncryptedDataSource"
+          parent="baseDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url"
+                  value="jdbc:mysql://replica.cptblsl3p9ay.us-west-1.rds.amazonaws.com/planlight?zeroDateTimeBehavior=convertToNull&amp;autoReconnect=true&amp;initialTimeout=10&amp;maxReconnects=180"/>
+        <property name="username" value="analytics"/>
+        <property name="password" value="!!UQvmjKcBYnMB4wIZwolaA8BFR4ZfNavg"/>
+    </bean>
+    <bean id="baseDataSource" abstract="true">
+        <property name="maxWaitMillis" value="5000"/>
+        <property name="maxTotal" value="1000"/>
+        <property name="minIdle" value="40"/>
+        <property name="initialSize" value="1"/>
+        <property name="testOnBorrow" value="true"/>
+        <property name="testOnReturn" value="false"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="validationQuery" value="SELECT 1"/>
+        <property name="removeAbandonedOnBorrow" value="true"/>
+        <property name="removeAbandonedTimeout" value="60"/>
+        <property name="logAbandoned" value="false"/>
+    </bean>-->
+
+    <!-- Data base connection -->
+    <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+
+    <!-- Product ID list -->
+    <!--<bean id="subProperties"-->
+          <!--class="com.adsk.acad.core.subscriptions.dataaccess.db.queries.properties.SubscriptionProperties">-->
+        <!--<property name="productID">-->
+            <!--<list>-->
+                <!--<value>com.autodesk.autocadws#pro1month</value>-->
+                <!--<value>Pro1Mo</value>-->
+                <!--<value>com.autodesk.autocadws#pro1year</value>-->
+                <!--<value>Pro1Y</value>-->
+                <!--<value>com.autodesk.autocadws#proplus1year</value>-->
+                <!--<value>ProPlus1Y</value>-->
+            <!--</list>-->
+        <!--</property>-->
+    <!--</bean>-->
+
+    <!--<bean id="appAnnieAPIConnection" class="com.adsk.analytics.appannie.AppAnnieAPIConnection">-->
+        <!--&lt;!&ndash;<property name="appAnnieHelper" ref="appAnnieHelper"/>&ndash;&gt;-->
+    <!--</bean>-->
+
+
+    <bean id="appAnnieHelper" class="com.adsk.analytics.appannie.AppAnnieHelper">
+        <property name="appAnnieURL" value="https://api.appannie.com/v1.2"/>
+        <property name="googlePlayAccountID" value="52007"/>
+        <property name="googlePlayProductID" value="20600000017181"/>
+        <property name="iOSAccountID" value="51546"/>
+        <property name="iOSProductID" value="393149734"/>
+        <property name="windowsAccountID" value="224226"/>
+        <property name="windowsProductID" value="40600000181890"/>
+        <property name="appAnnieAPIKey" value="bfaf368c135f947abcd900b9cc9afcf298104ac5"/>
+    </bean>
+
+    <!--<bean id="subscriptionsDB" class="com.adsk.acad.core.subscriptions.dataaccess.db.DBSubscriptionsDataAccess"-->
+          <!--depends-on="dataSource">-->
+        <!--<constructor-arg ref="dataSource"/>-->
+    <!--</bean>-->
+
+    <!--<bean id="subscriptionsUtils" class="com.adsk.acad.core.subscriptions.controller.SubscriptionsUtils"-->
+          <!--depends-on="subscriptionsDB">-->
+        <!--<constructor-arg ref="subscriptionsDB"/>-->
+        <!--<property name="subscriptionProperties" ref="subProperties"/>-->
+    <!--</bean>-->
+
+    <context:annotation-config/>
+    <context:component-scan base-package="com.adsk.analytics.adapter"/>
+    <context:component-scan base-package="com.adsk.acad.servlet.jersey.analyticsresources"/>
+
+    <!-- The Factory bean will return the object with respect to the alias name passed. -->
+    <bean id="dashboardFactory" class="org.springframework.beans.factory.config.ServiceLocatorFactoryBean">
+        <property name="serviceLocatorInterface" value="com.adsk.analytics.adapter.DashboardFactory"/>
+    </bean>
+
+
+    <alias alias="GECKO" name="geckoboard"/>
+    <alias alias="DUCKS" name="ducksboard"/>
+
+    <!-- specifing class and method that is going to be called on a specified time basis -->
+    <!--<bean id="hourlyScheduleJob"-->
+          <!--class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">-->
+        <!--<property name="targetObject" ref="schedulerJob"/>-->
+        <!--<property name="targetMethod" value="setUpDBData"/>-->
+    <!--</bean>-->
+    <!--<bean id="schedulerJob" class="com.adsk.analytics.scheduler.ScheduledDataLoader" depends-on="subscriptionsUtils">-->
+        <!--<constructor-arg ref="subscriptionsUtils"/>-->
+    <!--</bean>-->
+
+    <!--<bean id="dailyScheduleJob"-->
+          <!--class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">-->
+        <!--<property name="targetObject" ref="dailySchedulerJob"/>-->
+        <!--<property name="targetMethod" value="loadData"/>-->
+    <!--</bean>-->
+
+    <!--<bean id="dailySchedulerJob" class="com.adsk.analytics.scheduler.DailyScheduledDataLoader"-->
+          <!--depends-on="subscriptionsUtils">-->
+        <!--<constructor-arg ref="subscriptionsUtils"/>-->
+        <!--<constructor-arg ref="appAnnieAPIConnection"/>-->
+    <!--</bean>-->
+
+    <bean id="monthlyScheduleJob"
+          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="monthlySchedulerJob"/>
+        <property name="targetMethod" value="loadData"/>
+    </bean>
+
+    <bean id="monthlySchedulerJob" class="com.adsk.analytics.scheduler.MonthlyScheduledDataLoader"
+          init-method="loadData"> <!-- initialize the data first time when server starts -->
+        <!--<constructor-arg ref="appAnnieAPIConnection"/>-->
+        <!--<property name="subscriptionsUtils" ref="subscriptionsUtils"/>-->
+    </bean>
+
+    <!-- simple trigger specify repeat interval and delay time -->
+    <!--<bean id="hourlyTrigger"-->
+          <!--class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">-->
+        <!--<property name="jobDetail" ref="hourlyScheduleJob"/>-->
+        <!--<property name="repeatInterval" value="3600000"/>-->
+        <!--&lt;!&ndash; hourly &ndash;&gt;-->
+        <!--<property name="startDelay" value="1000"/>-->
+    <!--</bean>-->
+    <!--<bean id="dailyTrigger"-->
+          <!--class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">-->
+        <!--<property name="jobDetail" ref="dailyScheduleJob"/>-->
+        <!--<property name="repeatInterval" value="86400000"/>-->
+        <!--&lt;!&ndash; every day &ndash;&gt;-->
+        <!--<property name="startDelay" value="1000"/>-->
+    <!--</bean>-->
+
+    <bean id="monthlyTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="monthlyScheduleJob"/>
+        <property name="cronExpression" value="0 0 1 1 1/1 ? *"/>
+        <!-- Day 1 of every month at 0100 hrs-->
+    </bean>
+
+    <!-- scheduler factory bean to bind,the executing code and time intervals together -->
+    <bean id="hourlyTriggerJob" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="jobDetails">
+            <list>
+                <!--<ref bean="hourlyScheduleJob"/>-->
+                <!--<ref bean="dailyScheduleJob"/>-->
+                <ref bean="monthlyScheduleJob"/>
+            </list>
+        </property>
+
+        <property name="triggers">
+            <list>
+                <!--<ref bean="hourlyTrigger"/>-->
+                <!--<ref bean="dailyTrigger"/>-->
+                <ref bean="monthlyTrigger"/>
+            </list>
+        </property>
+    </bean>
+
+</beans>

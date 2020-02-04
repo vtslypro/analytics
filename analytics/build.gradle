@@ -1,0 +1,42 @@
+group 'analytics'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'war'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+
+    compile 'com.sun.jersey:jersey-bundle:1.17'
+    compile 'asm:asm:3.3.1'
+    compile 'org.springframework:spring-core:4.2.5.RELEASE'
+    compile 'org.springframework:spring-context-support:4.2.5.RELEASE'
+    compile 'org.springframework:spring-web:4.2.5.RELEASE'
+    compile 'com.googlecode.json-simple:json-simple:1.1'
+    compile 'org.springframework:spring-jdbc:4.2.5.RELEASE'
+    compile 'com.sun.jersey.contribs:jersey-spring:1.18.1'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+    compile 'org.springframework:spring-tx:4.2.5.RELEASE'
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.0-alpha4'
+    compile 'org.quartz-scheduler:quartz:2.2.1'
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.3.1'
+    compile 'redis.clients:jedis:2.6.2'
+    compile 'javax.servlet:servlet-api:2.4'
+    testCompile 'org.jmock:jmock-junit4:2.8.1'
+    testCompile 'org.mockito:mockito-all:1.10.19'
+    testCompile 'org.glassfish.jersey.core:jersey-client:2.13'
+    testCompile 'org.springframework:spring-test:4.2.5.RELEASE'
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+
+}
+
+war {
+    from 'WebContent'
+    baseName 'analytics'
+}

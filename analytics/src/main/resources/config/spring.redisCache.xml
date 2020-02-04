@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+    <!--<bean id="propertyPlaceholderConfigurer"-->
+          <!--class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">-->
+        <!--<property name="location" value="file:${AUTOCAD360_PROPS_FILE}" />-->
+        <!--<property name="searchSystemEnvironment" value="true" />-->
+        <!--<property name="ignoreUnresolvablePlaceholders" value="true" />-->
+    <!--</bean>-->
+
+    <bean id="jedisConfig" class="com.adsk.analytics.utils.redis.JedisPoolConfigWrapper" init-method="init">
+        <!-- Maximum active connections to Redis instance -->
+        <property name="maxTotal" value="128" />
+        <!-- Number of connections to Redis that just sit there and do nothing -->
+        <property name="maxIdle" value="5" />
+        <!-- Minimum number of idle connections to Redis - these can be seen as always open and ready to serve -->
+        <property name="minIdle" value="1" />
+        <!-- Tests whether connection is dead when connection retrieval method is called -->
+        <property name="testOnBorrow" value="false" />
+        <!-- Tests whether connection is dead when returning a connection to the pool -->
+        <property name="testOnReturn" value="false" />
+        <!-- Tests whether connections are dead during idle periods -->
+        <property name="testWhileIdle" value="true" />
+        <!-- Action to take when trying to acquire a connection and all connections are taken -->
+        <property name="blockWhenExhausted" value="false" />
+        <!-- Maximum time, in milliseconds, to wait for a resource when exausted action is set to WHEN_EXAUSTED_BLOCK -->
+        <property name="maxWaitMillis" value="3000" />
+    </bean>
+
+    <bean id="prod.redisConfig" class="com.adsk.analytics.utils.redis.RedisConfiguration" lazy-init="true">
+        <!-- Endpoint url of the redis cache -->
+        <constructor-arg index="0" type="java.lang.String" value="ac360prod-main.9hhbgc.ng.0001.usw1.cache.amazonaws.com"/>
+        <!-- port of the redis cache -->
+        <constructor-arg index="1" type="int" value="6379" />
+        <!-- redis cache timeout -->
+        <constructor-arg index="2" type="int" value="3000" />
+    </bean>
+
+    <alias name="prod.redisConfig" alias="pre.redisConfig" />
+
+    <bean id="staging.redisConfig" class="com.adsk.analytics.utils.redis.RedisConfiguration" lazy-init="true">
+        <!-- Endpoint url of the redis cache -->
+        <constructor-arg index="0" type="java.lang.String" value="ac360stg-main.bsbteq.0001.use1.cache.amazonaws.com" />
+        <!-- port of the redis cache -->
+        <constructor-arg index="1" type="int" value="6379" />
+        <!-- redis cache timeout -->
+        <constructor-arg index="2" type="int" value="3000" />
+    </bean>
+
+
+    <bean id="int.redisConfig" class="com.adsk.analytics.utils.redis.RedisConfiguration" lazy-init="true">
+        <!-- Endpoint url of the redis cache -->
+        <constructor-arg index="0" type="java.lang.String" value="ac360int-main.bsbteq.0001.use1.cache.amazonaws.com" />
+        <!-- port of the redis cache -->
+        <constructor-arg index="1" type="int" value="6379" />
+        <!-- redis cache timeout -->
+        <constructor-arg index="2" type="int" value="3000" />
+    </bean>
+
+    <!--Local setting to work through tunneling to staging's redis -->
+    <bean id="local.redisConfig" class="com.adsk.analytics.utils.redis.RedisConfiguration" lazy-init="true">
+        <!-- Endpoint url of the redis cache -->
+        <constructor-arg index="0" type="java.lang.String" value="localhost" />
+        <!-- port of the redis cache -->
+        <constructor-arg index="1" type="int" value="3366" />
+        <!-- redis cache timeout -->
+        <constructor-arg index="2" type="int" value="3000" />
+    </bean>
+
+    <!--Original local values-->
+    <!--<constructor-arg index="1" type="int" value="6379" />-->
+
+    <bean id="redisConfig" parent="prod.redisConfig" />
+
+    <!-- Cache Handler -->
+    <bean id="redisCacheHandler" class="com.adsk.analytics.utils.RedisCacheHandler">
+
+    </bean>
+
+</beans>
